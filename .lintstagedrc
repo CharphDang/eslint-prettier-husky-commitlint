@@ -1,6 +1,5 @@
 {
   "**/*.{js,jsx}": [
-    "prettier --config .prettierrc --write",
     "eslint --fix"
   ],
   "**/*.less": [
