@@ -1,0 +1,14 @@
+
+/node_modules/
+/dist/
+/lib/
+/node/
+/test/coverage
+npm-debug.log
+.jsbeautifyrc
+.DS_Store
+eslint-checkstyle.xml
+test-results.xml
+package-lock.json
+/i18n/unTranslationFile/
+.idea

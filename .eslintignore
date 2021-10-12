@@ -1,0 +1,4 @@
+test/*
+build/*
+i18n/*
+dist/*
