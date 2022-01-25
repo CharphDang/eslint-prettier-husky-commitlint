@@ -1,8 +1,8 @@
-# Eslint + Prettier + stylelint + Husky + Lint-staged 
+# Eslint + Prettier + stylelint + Husky + Lint-staged + verifyCommitMessage
 
 
 
-> 完成它， 你的工程将会有一个统一风格的格式化标准，并且不需要人为的关注是否有问题，在git commit 命令时，也会自动去格式化代码再提交。所以无需关心团队编码工具是否一致。
+> 完成它， 你的工程将会有一个统一风格的格式化标准，并且不需要人为的关注是否有问题，在git commit 命令时，会对message 的内容进行校验，保证提交信息都符合规范。也会自动去格式化代码再提交。所以无需关心团队编码工具是否一致。
 
 Reference Link:
 
@@ -114,6 +114,7 @@ Reference Link:
 
    ```js
    npx husky add .husky/pre-commit "npx lint-staged"
+   npx husky add .husky/commit-msg "node scripts/verifyCommit.js"
    ```
 
 3. Define lint-staged file
@@ -128,6 +129,31 @@ Reference Link:
      "**/*.less": [
        "stylelint --fix"
      ]
+   }
+   ```
+   
+3. Create the `scripts/verifyCommit.js`
+
+   ```js
+   /* eslint-disable no-undef */
+   const msg = require('fs').readFileSync('.git/COMMIT_EDITMSG', 'utf-8').trim();
+   
+   const commitRE =
+     /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?: .{1,50}/;
+   const mergeRe = /^(Merge pull request|Merge branch)/;
+   if (!commitRE.test(msg)) {
+     if (!mergeRe.test(msg)) {
+       console.log('git commit信息校验不通过');
+   
+       console.error(`git commit的信息格式不对, 需要使用 title(scope): desc的格式
+         比如 fix: xxbug
+         feat(test): add new
+         具体校验逻辑看 scripts/verifyCommit.js
+       `);
+       process.exit(1);
+     }
+   } else {
+     console.log('git commit信息校验通过');
    }
    ```
 
