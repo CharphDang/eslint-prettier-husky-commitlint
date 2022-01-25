@@ -132,7 +132,7 @@ Reference Link:
    }
    ```
    
-3. Create the `scripts/verifyCommit.js`
+4. Create the `scripts/verifyCommit.js`
 
    ```js
    /* eslint-disable no-undef */
