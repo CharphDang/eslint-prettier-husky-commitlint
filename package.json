@@ -5,7 +5,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "eslint:ci": "eslint $(git diff origin/develop --name-only | grep -E '^src/.*\\.(jsx|js)$')",
+    "stylelint:ci": "stylelint $(git diff origin/develop --name-only | grep -E '\\.less$') 'fake.none' --allow-empty-input"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
