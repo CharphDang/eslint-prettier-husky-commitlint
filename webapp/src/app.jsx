@@ -5,5 +5,5 @@ class App extends Component {
     return <div>{1 + 2 - 3}</div>;
   }
 }
-
+console.log(123); // Charph-log
 ReactDom.render(<App />, document.querySelector('#app'));
