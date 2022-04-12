@@ -18,6 +18,8 @@ Reference Link:
 ```json
 // package.json
 "devDependencies": {
+    "@commitlint/cli": "^16.2.3",
+    "@commitlint/config-conventional": "^16.2.1",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -114,7 +116,7 @@ Reference Link:
 
    ```js
    npx husky add .husky/pre-commit "npx lint-staged"
-   npx husky add .husky/commit-msg "node scripts/verifyCommit.js"
+   npx husky add .husky/commit-msg "npx commitlint --edit $1"
    ```
 
 3. Define lint-staged file
@@ -132,30 +134,58 @@ Reference Link:
    }
    ```
    
-4. Create the `scripts/verifyCommit.js`
+4. Create the `.commitlintrc`，详细规则请看官方 [rules](https://commitlint.js.org/#/reference-rules)
 
-   ```js
-   /* eslint-disable no-undef */
-   const msg = require('fs').readFileSync('.git/COMMIT_EDITMSG', 'utf-8').trim();
-   
-   const commitRE =
-     /^(revert: )?(feat|fix|docs|dx|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release)(\(.+\))?: .{1,50}/;
-   const mergeRe = /^(Merge pull request|Merge branch)/;
-   if (!commitRE.test(msg)) {
-     if (!mergeRe.test(msg)) {
-       console.log('git commit信息校验不通过');
-   
-       console.error(`git commit的信息格式不对, 需要使用 title(scope): desc的格式
-         比如 fix: xxbug
-         feat(test): add new
-         具体校验逻辑看 scripts/verifyCommit.js
-       `);
-       process.exit(1);
-     }
-   } else {
-     console.log('git commit信息校验通过');
-   }
+   ```json
+   {
+      "extends": ["@commitlint/config-conventional"],
+      "rules": {
+        "body-leading-blank": [2, "always"],
+        "footer-leading-blank": [1, "always"],
+        "header-max-length": [2, "always", 108],
+        "type-empty": [2, "never"],
+        "scope-empty": [0],
+        "subject-empty": [2, "never"],
+        "subject-full-stop": [0],
+        "type-case": [0],
+        "scope-case": [0],
+        "subject-case": [0],
+        "type-enum": [
+          2,
+          "always",
+          [
+            "feat",
+            "fix",
+            "perf",
+            "style",
+            "docs",
+            "test",
+            "refactor",
+            "build",
+            "ci",
+            "chore",
+            "revert"
+          ]
+        ]
+      }
+    }
    ```
+
+**类型描述：**
+
+Type     | Description                                                                                                                         |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| feat     | Adds a new feature                                                                                                                  |
+| fix      | Solves a bug                                                                                                                        |
+| perf     | Improves performance                                                                                                                |
+| style    | Improves formatting, white-space, does not change the code logic.                                                                   |
+| docs     | Adds or alters documentation                                                                                                        |
+| test     | Adds or modifies unit tests                                                                                                         |
+| refactor | Rewrites code without feature, performance or bug changes                                                                           |
+| build    | The main purpose is to modify the submission of the project build system (such as the configuration of gulp, webpack, rollup, etc.) |
+| ci       | The main purpose is to modify the continuous integration process of the project                                                     |
+| chore    | Other changes that don't modify src or test files. Change the build process, or add dependent libraries, tools, etc.                |
+| revert   | Reverts a previous commit
 
 ### Vscode plugin
 
@@ -214,5 +244,25 @@ Reference Link:
 }
 ```
 
+### 如果你的团队觉得在每次的commit都进行代码的eslint 校验or修复太过于繁琐，可以使用pre-push 的hook钩子来处理，对应的命令可以在scripts中配置，然后调用即可。
+```json
+  // package.json
+  ...
+  "scripts": {
+    "prepare": "husky install",
+    "eslint:ci": "eslint $(git diff origin/master --name-only | grep -E '^src/.*\\.(jsx|js)$')",
+    "stylelint:ci": "stylelint $(git diff origin/master --name-only | grep -E '\\.less$') 'fake.none' --allow-empty-input"
+  },
+...
+```
+
+```
+// pre-push file
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npm run eslint:ci
+npm run stylelint:ci
+```
 
 
