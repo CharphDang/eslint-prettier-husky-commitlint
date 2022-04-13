@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
-    "eslint:ci": "eslint $(git diff origin/master --name-only | grep -E '^src/.*\\.(jsx|js)$')",
-    "stylelint:ci": "stylelint $(git diff origin/master --name-only | grep -E '\\.less$') 'fake.none' --allow-empty-input"
+    "eslint:ci": "eslint $(git diff HEAD --name-only | grep -E '^src/.*\\.(jsx|js)$' | xargs)",
+    "stylelint:ci": "stylelint $(git diff HEAD --name-only | grep -E '\\.less$' | xargs) 'fake.none' --allow-empty-input"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.3",
